@@ -1,12 +1,12 @@
-# py6502emu: A 6502 CPU Emulator in Python
+# pyC64emu: Un Emulatore di Commodore 64 in Python
 
-This project is a Python-based emulator for the MOS Technology 6502 microprocessor. The goal is to create a simple, understandable, and extensible emulation of the classic 8-bit CPU that powered legendary systems like the Commodore 64, Apple II, and Nintendo Entertainment System.
+Questo progetto è un emulatore per il Commodore 64 basato su Python. L'obiettivo è creare un'emulazione semplice, comprensibile ed estensibile del classico computer a 8 bit, inclusa la sua CPU MOS 6510, i chip custom e un'interfaccia grafica completa.
 
-This project was developed with the assistance of Gemini Code Assist, refactoring and extending an initial version to be more modular, accurate, and feature-complete, including a full-featured graphical user interface.
+Questo progetto è stato sviluppato con l'assistenza di Gemini Code Assist, che ha eseguito il refactoring e l'estensione di una versione iniziale per renderla più modulare, accurata e completa di funzionalità, inclusa un'interfaccia utente grafica.
 
-## Core Emulator Features
+## Funzionalità Principali dell'Emulatore
 
-The emulator currently supports a wide range of the 6502's capabilities:
+L'emulatore attualmente supporta un'ampia gamma delle capacità del C64:
 
 *   **Full Official Instruction Set**: All 56 official instructions are implemented.
 *   **Cycle-Accurate Emulation**: The emulator is cycle-accurate for all official and most common undocumented instructions, including variable timings for branches and page-boundary crossings.
@@ -20,10 +20,10 @@ The emulator currently supports a wide range of the 6502's capabilities:
 *   **Interrupt Handling**:
     *   Non-Maskable Interrupts (NMI)
     *   Standard Interrupt Requests (IRQ)
-    *   Software interrupts via the `BRK` instruction.
+    *   Interrupt software tramite l'istruzione `BRK`.
 *   **Decimal Mode**: Accurate Binary-Coded Decimal (BCD) arithmetic for `ADC` and `SBC` instructions when the decimal flag is set.
-*   **Modular Architecture**: A clean separation between the `CPU` and the system `Bus`, allowing for easier expansion.
-*   **Functional Test Success**: The emulator successfully passes Klaus Dormann's comprehensive `6502_functional_test.bin`.
+*   **Architettura Modulare**: Una netta separazione tra `CPU`, `Bus`, `MemoryManager` e periferiche, che consente un'espansione più semplice.
+*   **Superamento Test Funzionali**: L'emulatore supera con successo il test funzionale completo `6502_functional_test.bin` di Klaus Dormann.
 
 ## Graphical User Interface (GUI)
 
@@ -31,11 +31,11 @@ The emulator includes an interactive GUI built with `pygame`, providing a real-t
 
 ### GUI Features
 
-*   **C64 Screen Display**: A direct rendering of the VIC-II video output.
-*   **Resizable Window**: The main window can be freely resized, and the C64 screen display will scale proportionally while maintaining its aspect ratio.
-*   **Live Info Panel**: A real-time display of:
-    *   **Paged Interface**: The info panel is organized into pages. Use the `Tab` key to cycle through them.
-    *   **CPU State**: Live view of registers (PC, A, X, Y, SP) and status flags. Includes an editor to modify register values.
+*   **Schermo C64**: Rendering diretto dell'output video del VIC-II.
+*   **Finestra Ridimensionabile**: La finestra principale può essere ridimensionata liberamente e lo schermo del C64 si adatterà proporzionalmente mantenendo il rapporto d'aspetto.
+*   **Pannello Info Live**: Una visualizzazione in tempo reale di:
+    *   **Interfaccia a Pagine**: Il pannello informativo è organizzato in pagine. Usa il tasto `Tab` per scorrerle.
+    *   **Stato CPU**: Vista live dei registri (PC, A, X, Y, SP) e dei flag di stato. Include un editor per modificare i valori dei registri.
     *   **Disassembly**: A live disassembly view centered on the current Program Counter.
     *   **Memory Viewer**: A hex dump of memory with an ASCII representation. Includes an editor to write values directly to memory.
     *   **Audio Visualizers**: An oscilloscope for the raw waveform and a spectrum analyzer for frequency content.
@@ -43,7 +43,7 @@ The emulator includes an interactive GUI built with `pygame`, providing a real-t
 *   **Keyboard Controls**:
     *   `Tab`: Cycle through the info panel pages.
     *   `F1`: Show or hide the in-emulator help screen.
-    *   `F2`: Toggle visibility of the audio visualizers.
+    *   `F2`: Mostra/nascondi i visualizzatori audio.
     *   `F5`: Toggle Run/Stop for the emulation.
     *   `F4`: Hold to rewind the emulation state. A flashing border indicates when rewind is active.
     *   `F6`: Execute a single CPU step (when stopped).
@@ -60,13 +60,17 @@ The emulator includes an interactive GUI built with `pygame`, providing a real-t
 
 ## Project Structure
 
-The project is organized into the following files:
+Il progetto è organizzato in una libreria `pyc64` e uno script di avvio:
 
-*   `gui.py`: The main entry point for the application. It contains all the code for the `tkinter` GUI and orchestrates the emulator.
-*   `cpu_6502.py`: Contains the core `CPU` class, which handles instruction decoding, execution, flag management, and interrupt logic. It also includes a powerful command-line debugger.
-*   `bus.py`: Implements the `Bus` class, which manages the system's 64KB memory space and provides a simple read/write interface for the CPU.
-*   `system.py`: A simple, non-GUI script for running the emulator, primarily used for running functional tests from the command line.
-*   `6502_functional_test.bin`: The binary for Klaus Dormann's 6502 functional test ROM, used to verify the accuracy of the CPU implementation.
+*   `main.py`: L'entry point principale dell'applicazione. Contiene tutto il codice per la GUI `pygame` e orchestra l'emulatore.
+*   `pyc64/`: La directory della libreria principale dell'emulatore.
+    *   `cpu.py`: Contiene la classe `CPU` principale, che gestisce la decodifica delle istruzioni, l'esecuzione, la gestione dei flag e la logica degli interrupt. Include anche un potente debugger.
+    *   `bus.py`: Implementa la classe `Bus`, che collega la CPU, la memoria e le periferiche.
+    *   `memory.py`: Contiene il `MemoryManager`, che gestisce la mappa di memoria del C64, inclusa la RAM, le ROM e la logica di **bank switching**.
+    *   `opcodes.py`: Definizioni statiche per tutti gli opcode del 6502.
+    *   `peripherals/`: Sottodirectory per i chip custom del C64 (`vic.py`, `sid.py`, `cia.py`).
+*   `system.py`: Uno script semplice e senza GUI per eseguire l'emulatore, utilizzato principalmente per test funzionali da riga di comando.
+*   `roms/`: Directory contenente i file ROM del C64.
 
 ## How to Run
 
@@ -74,21 +78,20 @@ The project is organized into the following files:
     ```bash
     pip install pygame numpy imageio imageio-ffmpeg
     ```
-    *Note: `imageio-ffmpeg` is required for video recording.*
 
-2.  **Get the ROMs**: Place the required Commodore 64 ROM files in the same directory as the project files. You will need:
-    *   `c64_basic.rom` (8KB)
-    *   `c64_kernal.rom` (8KB)
+2.  **Get the ROMs**: Place the required Commodore 64 ROM files in the `roms/` directory. You will need:
+    *   `basic.rom` (8KB)
+    *   `kernal.rom` (8KB)
     *   `char.rom` (4KB)
-3.  **Run the Emulator**: Open a terminal or command prompt, navigate to the project directory, and execute the `gui.py` script:
+3.  **Run the Emulator**: Open a terminal or command prompt, navigate to the project directory, and execute the `main.py` script:
     ```bash
-    python gui.py
+    python main.py
     ```
 The GUI will launch and automatically start the C64 at the BASIC `READY.` prompt.
 
 To load and run a `.prg` file, either drag and drop it onto the window or pass its filename as a command-line argument:
 ```bash
-python gui.py your_program.prg
+python main.py your_program.prg
 ```
 
 ## Command-Line Debugger

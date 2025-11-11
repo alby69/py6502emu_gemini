@@ -1,0 +1,161 @@
+# pyc64/opcodes.py
+
+from enum import Enum, auto
+
+class Mode(Enum):
+    IMMEDIATE = auto()
+    ZEROPAGE = auto()
+    ZEROPAGEX = auto()
+    ZEROPAGEY = auto()
+    ABSOLUTE = auto()
+    ABSOLUTEX = auto()
+    ABSOLUTEY = auto()
+    IMPLIED = auto()
+    INDIRECT = auto()
+    RELATIVE = auto()
+    ACCUMULATOR = auto()
+    INDIRECTX = auto()
+    INDIRECTY = auto()
+
+def get_opcode_definitions(cpu):
+    """Returns a dictionary mapping opcodes to their implementation."""
+    return {
+        0x00: {"f": cpu.BRK, "m": Mode.IMPLIED}, 0x40: {"f": cpu.RTI, "m": Mode.IMPLIED},
+        0xA9: {"f": cpu.LDA, "m": Mode.IMMEDIATE}, 0xA5: {"f": cpu.LDA, "m": Mode.ZEROPAGE},
+        0xAD: {"f": cpu.LDA, "m": Mode.ABSOLUTE}, 0xB5: {"f": cpu.LDA, "m": Mode.ZEROPAGEX},
+        0xA1: {"f": cpu.LDA, "m": Mode.INDIRECTX}, 0xB1: {"f": cpu.LDA, "m": Mode.INDIRECTY},
+        0xBD: {"f": cpu.LDA, "m": Mode.ABSOLUTEX}, 0xB9: {"f": cpu.LDA, "m": Mode.ABSOLUTEY},
+        0xA2: {"f": cpu.LDX, "m": Mode.IMMEDIATE}, 0xA6: {"f": cpu.LDX, "m": Mode.ZEROPAGE},
+        0xB6: {"f": cpu.LDX, "m": Mode.ZEROPAGEY}, 0xAE: {"f": cpu.LDX, "m": Mode.ABSOLUTE},
+        0xBE: {"f": cpu.LDX, "m": Mode.ABSOLUTEY}, 0xA0: {"f": cpu.LDY, "m": Mode.IMMEDIATE},
+        0xA4: {"f": cpu.LDY, "m": Mode.ZEROPAGE}, 0xB4: {"f": cpu.LDY, "m": Mode.ZEROPAGEX},
+        0xAC: {"f": cpu.LDY, "m": Mode.ABSOLUTE}, 0xBC: {"f": cpu.LDY, "m": Mode.ABSOLUTEX},
+        0x85: {"f": cpu.STA, "m": Mode.ZEROPAGE}, 0x95: {"f": cpu.STA, "m": Mode.ZEROPAGEX},
+        0x8D: {"f": cpu.STA, "m": Mode.ABSOLUTE}, 0x9D: {"f": cpu.STA, "m": Mode.ABSOLUTEX},
+        0x99: {"f": cpu.STA, "m": Mode.ABSOLUTEY}, 0x81: {"f": cpu.STA, "m": Mode.INDIRECTX},
+        0x91: {"f": cpu.STA, "m": Mode.INDIRECTY}, 0x86: {"f": cpu.STX, "m": Mode.ZEROPAGE},
+        0x96: {"f": cpu.STX, "m": Mode.ZEROPAGEY}, 0x8E: {"f": cpu.STX, "m": Mode.ABSOLUTE},
+        0x84: {"f": cpu.STY, "m": Mode.ZEROPAGE}, 0x94: {"f": cpu.STY, "m": Mode.ZEROPAGEX},
+        0x8C: {"f": cpu.STY, "m": Mode.ABSOLUTE}, 0xE8: {"f": cpu.INX, "m": Mode.IMPLIED},
+        0xC8: {"f": cpu.INY, "m": Mode.IMPLIED}, 0xCA: {"f": cpu.DEX, "m": Mode.IMPLIED},
+        0x88: {"f": cpu.DEY, "m": Mode.IMPLIED}, 0xAA: {"f": cpu.TAX, "m": Mode.IMPLIED},
+        0x8A: {"f": cpu.TXA, "m": Mode.IMPLIED}, 0xA8: {"f": cpu.TAY, "m": Mode.IMPLIED},
+        0x98: {"f": cpu.TYA, "m": Mode.IMPLIED}, 0x18: {"f": cpu.CLC, "m": Mode.IMPLIED},
+        0x38: {"f": cpu.SEC, "m": Mode.IMPLIED}, 0x58: {"f": cpu.CLI, "m": Mode.IMPLIED},
+        0x78: {"f": cpu.SEI, "m": Mode.IMPLIED}, 0xB8: {"f": cpu.CLV, "m": Mode.IMPLIED},
+        0xD8: {"f": cpu.CLD, "m": Mode.IMPLIED}, 0xF8: {"f": cpu.SED, "m": Mode.IMPLIED},
+        0x4C: {"f": cpu.JMP, "m": Mode.ABSOLUTE}, 0x6C: {"f": cpu.JMP, "m": Mode.INDIRECT},
+        0xC9: {"f": cpu.CMP, "m": Mode.IMMEDIATE}, 0xC5: {"f": cpu.CMP, "m": Mode.ZEROPAGE},
+        0xD5: {"f": cpu.CMP, "m": Mode.ZEROPAGEX}, 0xCD: {"f": cpu.CMP, "m": Mode.ABSOLUTE},
+        0xDD: {"f": cpu.CMP, "m": Mode.ABSOLUTEX}, 0xD9: {"f": cpu.CMP, "m": Mode.ABSOLUTEY},
+        0xC1: {"f": cpu.CMP, "m": Mode.INDIRECTX}, 0xD1: {"f": cpu.CMP, "m": Mode.INDIRECTY},
+        0x10: {"f": cpu.BPL, "m": Mode.RELATIVE}, 0x30: {"f": cpu.BMI, "m": Mode.RELATIVE},
+        0x50: {"f": cpu.BVC, "m": Mode.RELATIVE}, 0x70: {"f": cpu.BVS, "m": Mode.RELATIVE},
+        0x90: {"f": cpu.BCC, "m": Mode.RELATIVE}, 0xB0: {"f": cpu.BCS, "m": Mode.RELATIVE},
+        0xD0: {"f": cpu.BNE, "m": Mode.RELATIVE}, 0xF0: {"f": cpu.BEQ, "m": Mode.RELATIVE},
+        0x9A: {"f": cpu.TXS, "m": Mode.IMPLIED}, 0xBA: {"f": cpu.TSX, "m": Mode.IMPLIED},
+        0x48: {"f": cpu.PHA, "m": Mode.IMPLIED}, 0x68: {"f": cpu.PLA, "m": Mode.IMPLIED},
+        0x08: {"f": cpu.PHP, "m": Mode.IMPLIED}, 0x28: {"f": cpu.PLP, "m": Mode.IMPLIED},
+        0x20: {"f": cpu.JSR, "m": Mode.ABSOLUTE}, 0x60: {"f": cpu.RTS, "m": Mode.IMPLIED},
+        0x69: {"f": cpu.ADC, "m": Mode.IMMEDIATE}, 0x65: {"f": cpu.ADC, "m": Mode.ZEROPAGE},
+        0x75: {"f": cpu.ADC, "m": Mode.ZEROPAGEX}, 0x6D: {"f": cpu.ADC, "m": Mode.ABSOLUTE},
+        0x7D: {"f": cpu.ADC, "m": Mode.ABSOLUTEX}, 0x79: {"f": cpu.ADC, "m": Mode.ABSOLUTEY},
+        0x61: {"f": cpu.ADC, "m": Mode.INDIRECTX}, 0x71: {"f": cpu.ADC, "m": Mode.INDIRECTY},
+        0x29: {"f": cpu.AND, "m": Mode.IMMEDIATE}, 0x25: {"f": cpu.AND, "m": Mode.ZEROPAGE},
+        0x35: {"f": cpu.AND, "m": Mode.ZEROPAGEX}, 0x2D: {"f": cpu.AND, "m": Mode.ABSOLUTE},
+        0x3D: {"f": cpu.AND, "m": Mode.ABSOLUTEX}, 0x39: {"f": cpu.AND, "m": Mode.ABSOLUTEY},
+        0x21: {"f": cpu.AND, "m": Mode.INDIRECTX}, 0x31: {"f": cpu.AND, "m": Mode.INDIRECTY},
+        0x09: {"f": cpu.ORA, "m": Mode.IMMEDIATE}, 0x05: {"f": cpu.ORA, "m": Mode.ZEROPAGE},
+        0x15: {"f": cpu.ORA, "m": Mode.ZEROPAGEX}, 0x0D: {"f": cpu.ORA, "m": Mode.ABSOLUTE},
+        0x1D: {"f": cpu.ORA, "m": Mode.ABSOLUTEX}, 0x19: {"f": cpu.ORA, "m": Mode.ABSOLUTEY},
+        0x01: {"f": cpu.ORA, "m": Mode.INDIRECTX}, 0x11: {"f": cpu.ORA, "m": Mode.INDIRECTY},
+        0x49: {"f": cpu.EOR, "m": Mode.IMMEDIATE}, 0x45: {"f": cpu.EOR, "m": Mode.ZEROPAGE},
+        0x55: {"f": cpu.EOR, "m": Mode.ZEROPAGEX}, 0x4D: {"f": cpu.EOR, "m": Mode.ABSOLUTE},
+        0x5D: {"f": cpu.EOR, "m": Mode.ABSOLUTEX}, 0x59: {"f": cpu.EOR, "m": Mode.ABSOLUTEY},
+        0x41: {"f": cpu.EOR, "m": Mode.INDIRECTX}, 0x51: {"f": cpu.EOR, "m": Mode.INDIRECTY},
+        0xE9: {"f": cpu.SBC, "m": Mode.IMMEDIATE}, 0xE5: {"f": cpu.SBC, "m": Mode.ZEROPAGE},
+        0xF5: {"f": cpu.SBC, "m": Mode.ZEROPAGEX}, 0xED: {"f": cpu.SBC, "m": Mode.ABSOLUTE},
+        0xFD: {"f": cpu.SBC, "m": Mode.ABSOLUTEX}, 0xF9: {"f": cpu.SBC, "m": Mode.ABSOLUTEY},
+        0xE1: {"f": cpu.SBC, "m": Mode.INDIRECTX}, 0xF1: {"f": cpu.SBC, "m": Mode.INDIRECTY},
+        0xEA: {"f": cpu.NOP, "m": Mode.IMPLIED}, 0x0A: {"f": cpu.ASL, "m": Mode.ACCUMULATOR},
+        0x06: {"f": cpu.ASL, "m": Mode.ZEROPAGE}, 0x16: {"f": cpu.ASL, "m": Mode.ZEROPAGEX},
+        0x0E: {"f": cpu.ASL, "m": Mode.ABSOLUTE}, 0x1E: {"f": cpu.ASL, "m": Mode.ABSOLUTEX},
+        0x4A: {"f": cpu.LSR, "m": Mode.ACCUMULATOR}, 0x46: {"f": cpu.LSR, "m": Mode.ZEROPAGE},
+        0x56: {"f": cpu.LSR, "m": Mode.ZEROPAGEX}, 0x4E: {"f": cpu.LSR, "m": Mode.ABSOLUTE},
+        0x5E: {"f": cpu.LSR, "m": Mode.ABSOLUTEX}, 0x2A: {"f": cpu.ROL, "m": Mode.ACCUMULATOR},
+        0x26: {"f": cpu.ROL, "m": Mode.ZEROPAGE}, 0x36: {"f": cpu.ROL, "m": Mode.ZEROPAGEX},
+        0x2E: {"f": cpu.ROL, "m": Mode.ABSOLUTE}, 0x3E: {"f": cpu.ROL, "m": Mode.ABSOLUTEX},
+        0x6A: {"f": cpu.ROR, "m": Mode.ACCUMULATOR}, 0x66: {"f": cpu.ROR, "m": Mode.ZEROPAGE},
+        0x76: {"f": cpu.ROR, "m": Mode.ZEROPAGEX}, 0x6E: {"f": cpu.ROR, "m": Mode.ABSOLUTE},
+        0x7E: {"f": cpu.ROR, "m": Mode.ABSOLUTEX}, 0x24: {"f": cpu.BIT, "m": Mode.ZEROPAGE},
+        0x2C: {"f": cpu.BIT, "m": Mode.ABSOLUTE}, 0xE0: {"f": cpu.CPX, "m": Mode.IMMEDIATE},
+        0xE4: {"f": cpu.CPX, "m": Mode.ZEROPAGE}, 0xEC: {"f": cpu.CPX, "m": Mode.ABSOLUTE},
+        0xC0: {"f": cpu.CPY, "m": Mode.IMMEDIATE}, 0xC4: {"f": cpu.CPY, "m": Mode.ZEROPAGE},
+        0xCC: {"f": cpu.CPY, "m": Mode.ABSOLUTE}, 0xE6: {"f": cpu.INC, "m": Mode.ZEROPAGE},
+        0xF6: {"f": cpu.INC, "m": Mode.ZEROPAGEX}, 0xEE: {"f": cpu.INC, "m": Mode.ABSOLUTE},
+        0xFE: {"f": cpu.INC, "m": Mode.ABSOLUTEX}, 0xC6: {"f": cpu.DEC, "m": Mode.ZEROPAGE},
+        0xD6: {"f": cpu.DEC, "m": Mode.ZEROPAGEX}, 0xCE: {"f": cpu.DEC, "m": Mode.ABSOLUTE},
+        0xDE: {"f": cpu.DEC, "m": Mode.ABSOLUTEX},
+        # Undocumented Opcodes
+        0x07: {"f": cpu.SLO, "m": Mode.ZEROPAGE}, 0x17: {"f": cpu.SLO, "m": Mode.ZEROPAGEX},
+        0x03: {"f": cpu.SLO, "m": Mode.INDIRECTX}, 0x13: {"f": cpu.SLO, "m": Mode.INDIRECTY},
+        0x0F: {"f": cpu.SLO, "m": Mode.ABSOLUTE}, 0x1F: {"f": cpu.SLO, "m": Mode.ABSOLUTEX},
+        0x1B: {"f": cpu.SLO, "m": Mode.ABSOLUTEY}, 0x27: {"f": cpu.RLA, "m": Mode.ZEROPAGE},
+        0x37: {"f": cpu.RLA, "m": Mode.ZEROPAGEX}, 0x23: {"f": cpu.RLA, "m": Mode.INDIRECTX},
+        0x33: {"f": cpu.RLA, "m": Mode.INDIRECTY}, 0x2F: {"f": cpu.RLA, "m": Mode.ABSOLUTE},
+        0x3F: {"f": cpu.RLA, "m": Mode.ABSOLUTEX}, 0x3B: {"f": cpu.RLA, "m": Mode.ABSOLUTEY},
+        0x87: {"f": cpu.SAX, "m": Mode.ZEROPAGE}, 0x97: {"f": cpu.SAX, "m": Mode.ZEROPAGEY},
+        0x83: {"f": cpu.SAX, "m": Mode.INDIRECTX}, 0x8F: {"f": cpu.SAX, "m": Mode.ABSOLUTE},
+        0xA7: {"f": cpu.LAX, "m": Mode.ZEROPAGE}, 0xB7: {"f": cpu.LAX, "m": Mode.ZEROPAGEY},
+        0xA3: {"f": cpu.LAX, "m": Mode.INDIRECTX}, 0xB3: {"f": cpu.LAX, "m": Mode.INDIRECTY},
+        0xAF: {"f": cpu.LAX, "m": Mode.ABSOLUTE}, 0xBF: {"f": cpu.LAX, "m": Mode.ABSOLUTEY},
+        0xC7: {"f": cpu.DCP, "m": Mode.ZEROPAGE}, 0xC3: {"f": cpu.DCP, "m": Mode.INDIRECTX},
+        0xCF: {"f": cpu.DCP, "m": Mode.ABSOLUTE}, 0xD7: {"f": cpu.DCP, "m": Mode.ZEROPAGEX},
+        0xDF: {"f": cpu.DCP, "m": Mode.ABSOLUTEX}, 0xDB: {"f": cpu.DCP, "m": Mode.ABSOLUTEY},
+        0xD3: {"f": cpu.DCP, "m": Mode.INDIRECTY},
+    }
+
+CYCLE_COUNTS = {
+    0x00: 7, 0x01: 6, 0x05: 3, 0x06: 5, 0x07: 5, 0x08: 3, 0x09: 2, 0x0A: 2, 0x0D: 4, 0x0E: 6,
+    0x10: 2, 0x11: 5, 0x15: 4, 0x16: 6, 0x17: 6, 0x18: 2, 0x19: 4, 0x1D: 4, 0x1E: 7, 0x20: 6,
+    0x21: 6, 0x24: 3, 0x25: 3, 0x26: 5, 0x28: 4, 0x29: 2, 0x2A: 2, 0x2C: 4, 0x2D: 4, 0x2E: 6,
+    0x30: 2, 0x31: 5, 0x35: 4, 0x36: 6, 0x38: 2, 0x39: 4, 0x3D: 4, 0x3E: 7, 0x40: 6, 0x41: 6,
+    0x45: 3, 0x46: 5, 0x48: 3, 0x49: 2, 0x4A: 2, 0x4C: 3, 0x4D: 4, 0x4E: 6, 0x50: 2, 0x51: 5,
+    0x55: 4, 0x56: 6, 0x58: 2, 0x59: 4, 0x5D: 4, 0x5E: 7, 0x60: 6, 0x61: 6, 0x65: 3, 0x66: 5,
+    0x68: 4, 0x69: 2, 0x6A: 2, 0x6C: 5, 0x6D: 4, 0x6E: 6, 0x70: 2, 0x71: 5, 0x75: 4, 0x76: 6,
+    0x78: 2, 0x79: 4, 0x7D: 4, 0x7E: 7, 0x81: 6, 0x84: 3, 0x85: 3, 0x86: 3, 0x88: 2, 0x8A: 2,
+    0x8C: 4, 0x8D: 4, 0x8E: 4, 0x90: 2, 0x91: 6, 0x94: 4, 0x95: 4, 0x96: 4, 0x98: 2, 0x99: 5,
+    0x9A: 2, 0x9D: 5, 0xA0: 2, 0xA1: 6, 0xA2: 2, 0xA4: 3, 0xA5: 3, 0xA6: 3, 0xA8: 2, 0xA9: 2,
+    0xAA: 2, 0xAC: 4, 0xAD: 4, 0xAE: 4, 0xB0: 2, 0xB1: 5, 0xB4: 4, 0xB5: 4, 0xB6: 4, 0xB8: 2,
+    0xB9: 4, 0xBA: 2, 0xBC: 4, 0xBD: 4, 0xBE: 4, 0xC0: 2, 0xC1: 6, 0xC4: 3, 0xC5: 3, 0xC6: 5,
+    0xC8: 2, 0xC9: 2, 0xCA: 2, 0xCC: 4, 0xCD: 4, 0xCE: 6, 0xD0: 2, 0xD1: 5, 0xD5: 4, 0xD6: 6,
+    0xD8: 2, 0xD9: 4, 0xDD: 4, 0xDE: 7, 0xE0: 2, 0xE1: 6, 0xE4: 3, 0xE5: 3, 0xE6: 5, 0xE8: 2,
+    0xE9: 2, 0xEA: 2, 0xEC: 4, 0xED: 4, 0xEE: 6, 0xF0: 2, 0xF1: 5, 0xF5: 4, 0xF6: 6, 0xF8: 2,
+    0xF9: 4, 0xFD: 4, 0xFE: 7,
+    # Undocumented
+    0x03: 8, 0x04: 3, 0x0B: 2, 0x0C: 4, 0x0F: 6, 0x13: 8, 0x14: 4, 0x1A: 2, 0x1B: 7, 0x1C: 4,
+    0x1F: 7, 0x23: 8, 0x2B: 2, 0x2F: 6, 0x33: 8, 0x34: 4, 0x3A: 2, 0x3B: 7, 0x3C: 4, 0x3F: 7,
+    0x43: 8, 0x44: 3, 0x4B: 2, 0x4F: 6, 0x53: 8, 0x54: 4, 0x5A: 2, 0x5B: 7, 0x5C: 4, 0x5F: 7,
+    0x63: 8, 0x64: 3, 0x6B: 2, 0x6F: 6, 0x73: 8, 0x74: 4, 0x7A: 2, 0x7B: 7, 0x7C: 4, 0x7F: 7,
+    0x80: 2, 0x82: 2, 0x83: 6, 0x87: 3, 0x89: 2, 0x8B: 2, 0x8F: 4, 0x93: 6, 0x97: 4, 0x9B: 5,
+    0x9C: 5, 0x9E: 5, 0x9F: 5, 0xA3: 6, 0xA7: 3, 0xAB: 2, 0xAF: 4, 0xB3: 5, 0xB7: 4, 0xBB: 4,
+    0xBF: 4, 0xC2: 2, 0xC3: 8, 0xC7: 5, 0xCB: 2, 0xCF: 6, 0xD3: 8, 0xD4: 4, 0xDA: 2, 0xDB: 7,
+    0xDC: 4, 0xDF: 7, 0xE2: 2, 0xE3: 8, 0xE7: 5, 0xEB: 2, 0xEF: 6, 0xF3: 8, 0xF4: 4, 0xFA: 2,
+    0xFB: 7, 0xFC: 4, 0xFF: 7,
+}
+
+INSTRUCTION_INCREMENTS = {
+    Mode.IMMEDIATE: 2,
+    Mode.ZEROPAGE: 2,
+    Mode.ZEROPAGEX: 2,
+    Mode.ZEROPAGEY: 2,
+    Mode.ABSOLUTE: 3,
+    Mode.IMPLIED: 1,
+    Mode.ABSOLUTEX: 3,
+    Mode.ABSOLUTEY: 3,
+    Mode.INDIRECT: 3,
+    Mode.RELATIVE: 2,
+    Mode.ACCUMULATOR: 1,
+    Mode.INDIRECTX: 2,
+    Mode.INDIRECTY: 2,
+}

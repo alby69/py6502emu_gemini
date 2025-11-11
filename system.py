@@ -1,19 +1,19 @@
-from cpu_6502 import *
-from bus import Bus
+from pyc64.cpu import CPU
+from pyc64.bus import Bus
 
 # --- Main Program ---
-bus = Bus()
-cpu = CPU(bus)
+cpu = CPU(None)
+bus = Bus(cpu)
+cpu.bus = bus
 
 # --- C64 ROM Loading ---
 print("Loading C64 ROMs...")
-bus.load_basic_rom_from_file("c64_basic.rom")
-bus.load_kernal_rom_from_file("c64_kernal.rom")
+bus.load_rom_from_file("roms/basic.rom", "basic")
+bus.load_rom_from_file("roms/kernal.rom", "kernal")
+bus.vic.load_char_rom("roms/char.rom")
 
 # Set PC to C64 KERNAL reset vector (read from $FFFC/$FFFD)
-# For now, we'll hardcode the typical entry point after reset.
-# A proper reset sequence would read $FFFC/$FFFD.
-cpu.pc = 0xFCE2 # Typical KERNAL cold start entry point
+cpu.pc = (bus.read(0xFFFC) | (bus.read(0xFFFD) << 8))
 print(f"CPU PC set to C64 KERNAL reset vector: ${cpu.pc:04X}")
 
 # --- Optional: Klaus Dormann's 6502 Functional Test Program ---
